@@ -1,5 +1,12 @@
 package base;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import pages.LoginPage;
 
@@ -7,6 +14,7 @@ public abstract class BaseTest {
 
     protected WebDriver driver;
     protected LoginPage loginPage;
+    protected Ambiente ambiente;
 
     protected static final String BASE_URL_DEFAULT = "<PON_AQUI_URL_LOGIN>";
     protected static final String VALID_USER_DEFAULT = "<VALID_USER>";
@@ -33,15 +41,23 @@ public abstract class BaseTest {
             );
         }
 
-        driver = DriverFactory.createDriver();
-        driver.get(baseUrl);
+        ambiente = new Ambiente();
+        driver = ambiente.abrirNavegador();
+        try {
+            driver.get(baseUrl);
+        } catch (TimeoutException e) {
+            // En sitios externos, algunos recursos pueden demorar y bloquear el evento "load".
+            ((JavascriptExecutor) driver).executeScript("window.stop();");
+        }
+        dumpPageIfEnabled();
         loginPage = new LoginPage(driver);
     }
 
     protected void cleanupTest() {
-        if (driver != null) {
-            driver.quit();
+        if (ambiente != null) {
+            ambiente.cerrarNavegador(driver);
             driver = null;
+            ambiente = null;
         }
     }
 
@@ -67,5 +83,48 @@ public abstract class BaseTest {
             return defaultValue;
         }
         return value.trim();
+    }
+
+    protected void configureFromSuite(
+        String browser,
+        String headless,
+        String suiteBaseUrl,
+        String suiteValidUser,
+        String suiteValidPass,
+        String suiteInvalidUser,
+        String suiteInvalidPass
+    ) {
+        setIfPresent("browser", browser);
+        setIfPresent("headless", headless);
+        setIfPresent("base.url", suiteBaseUrl);
+        setIfPresent("valid.user", suiteValidUser);
+        setIfPresent("valid.pass", suiteValidPass);
+        setIfPresent("invalid.user", suiteInvalidUser);
+        setIfPresent("invalid.pass", suiteInvalidPass);
+    }
+
+    protected void setIfPresent(String property, String value) {
+        String existingValue = System.getProperty(property);
+        if ((existingValue == null || existingValue.isBlank()) && value != null && !value.isBlank()) {
+            System.setProperty(property, value.trim());
+        }
+    }
+
+    private void dumpPageIfEnabled() {
+        if (!Boolean.parseBoolean(System.getProperty("debug.dumpPage", "false"))) {
+            return;
+        }
+        try {
+            Path dir = Path.of("target", "debug-pages");
+            Files.createDirectories(dir);
+            String fileName = "page-" + Instant.now().toEpochMilli() + ".html";
+            Path output = dir.resolve(fileName);
+            Files.writeString(output, driver.getPageSource(), StandardCharsets.UTF_8);
+            System.out.println("[DEBUG] Page dump: " + output.toAbsolutePath());
+            System.out.println("[DEBUG] Current URL: " + driver.getCurrentUrl());
+            System.out.println("[DEBUG] Title: " + driver.getTitle());
+        } catch (IOException e) {
+            System.out.println("[WARN] No se pudo guardar page dump: " + e.getMessage());
+        }
     }
 }

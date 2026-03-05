@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mock Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; background: #f3f6f9; }
+    .card { max-width: 360px; background: #fff; border: 1px solid #d5dbe1; border-radius: 8px; padding: 16px; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+    button { margin-top: 14px; padding: 8px 12px; }
+    .alert-danger { color: #b42318; margin-top: 12px; }
+    .success { color: #027a48; margin-top: 12px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Inicio de sesión</h1>
+    <form id="loginForm">
+      <label for="username">Usuario</label>
+      <input id="username" name="username" type="text" />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" />
+
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <div id="error" class="alert-danger" role="alert" style="display:none"></div>
+    <div id="success" class="success" style="display:none"></div>
+  </div>
+
+  <script>
+    const validUser = "qa_user";
+    const validPass = "qa_pass";
+
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      const error = document.getElementById("error");
+      const success = document.getElementById("success");
+
+      error.style.display = "none";
+      success.style.display = "none";
+      error.textContent = "";
+      success.textContent = "";
+
+      if (user === validUser && pass === validPass) {
+        success.textContent = "Bienvenido, " + user;
+        success.style.display = "block";
+        return;
+      }
+
+      error.textContent = "Credenciales inválidas";
+      error.style.display = "block";
+    });
+  </script>
+</body>
+</html>

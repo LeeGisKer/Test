@@ -1,6 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+      Universidad: <PENDIENTE_COMPLETAR>
+      Estudiante: <PENDIENTE_COMPLETAR>
+      Matricula: <PENDIENTE_COMPLETAR>
+      Asesor(a): <PENDIENTE_COMPLETAR>
+      Modulo: <PENDIENTE_COMPLETAR>
+      Reto: Reto 5. Automatizacion de una pantalla login
+      Fecha de elaboracion: <PENDIENTE_COMPLETAR>
+    -->
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>qa.automation</groupId>
@@ -64,6 +73,24 @@
                         <configuration>
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/testng/InicioSesion.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>InicioDeSesion</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${surefire.version}</version>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/testng/InicioDeSesion.xml</suiteXmlFile>
                             </suiteXmlFiles>
                         </configuration>
                     </plugin>

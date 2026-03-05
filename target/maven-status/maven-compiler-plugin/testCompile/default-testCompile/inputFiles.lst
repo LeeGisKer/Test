@@ -1,0 +1,11 @@
+/home/l/Downloads/Test/src/test/java/base/Ambiente.java
+/home/l/Downloads/Test/src/test/java/base/BaseTest.java
+/home/l/Downloads/Test/src/test/java/base/DriverFactory.java
+/home/l/Downloads/Test/src/test/java/pages/LoginLocators.java
+/home/l/Downloads/Test/src/test/java/pages/LoginPage.java
+/home/l/Downloads/Test/src/test/java/tests/IniciarSesion_CorreoIncorrecto.java
+/home/l/Downloads/Test/src/test/java/tests/IniciarSesion_CredencialesCorrectas.java
+/home/l/Downloads/Test/src/test/java/tests/LoginExitosoTest.java
+/home/l/Downloads/Test/src/test/java/tests/LoginFallidoTest.java
+/home/l/Downloads/Test/src/test/java/utils/PasosEstandar.java
+/home/l/Downloads/Test/src/test/java/utils/WaitUtils.java

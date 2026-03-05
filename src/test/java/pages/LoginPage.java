@@ -4,43 +4,60 @@ import java.time.Duration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import utils.PasosEstandar;
 import utils.WaitUtils;
 
 public class LoginPage {
 
     private final WaitUtils waitUtils;
+    private final PasosEstandar pasosEstandar;
 
     // TODO: Ajustar con los locators reales inspeccionando el DOM.
-    // Preferir id o name; usar CSS/XPath solo si no existe alternativa estable.
-    public static final By USERNAME_INPUT = By.id("username");
-    public static final By PASSWORD_INPUT = By.id("password");
-    public static final By LOGIN_BUTTON = By.cssSelector("button[type='submit']");
+    public static final By USERNAME_INPUT = LoginLocators.USERNAME_INPUT;
+    public static final By PASSWORD_INPUT = LoginLocators.PASSWORD_INPUT;
+    public static final By LOGIN_BUTTON = LoginLocators.LOGIN_BUTTON;
+    public static final By LOGIN_BUTTON_ALT = LoginLocators.LOGIN_BUTTON_ALT;
+    public static final By LOGIN_FORM = LoginLocators.LOGIN_FORM;
+
+    public static final By REGISTER_EMAIL_INPUT = LoginLocators.REGISTER_EMAIL_INPUT;
+    public static final By REGISTER_PASSWORD_INPUT = LoginLocators.REGISTER_PASSWORD_INPUT;
+    public static final By REGISTER_BUTTON = LoginLocators.REGISTER_BUTTON;
+    public static final By REGISTER_FORM = LoginLocators.REGISTER_FORM;
 
     // TODO: Ajustar al elemento real mostrado cuando el login es exitoso.
-    public static final By SUCCESS_INDICATOR = By.xpath("//*[contains(text(),'Bienvenido') or contains(text(),'Dashboard') or contains(text(),'Logout')]");
+    public static final By SUCCESS_INDICATOR = LoginLocators.SUCCESS_INDICATOR;
+    public static final By LOGOUT_LINK = LoginLocators.LOGOUT_LINK;
 
     // TODO: Ajustar al elemento real de error cuando las credenciales son inválidas.
-    public static final By ERROR_MESSAGE = By.cssSelector(".error, .alert-danger, [role='alert']");
+    public static final By ERROR_MESSAGE = LoginLocators.ERROR_MESSAGE;
 
     public LoginPage(WebDriver driver) {
-        this.waitUtils = new WaitUtils(driver, Duration.ofSeconds(10));
+        this.waitUtils = new WaitUtils(driver, Duration.ofSeconds(20));
+        this.pasosEstandar = new PasosEstandar(driver, waitUtils);
     }
 
     public void login(String username, String password) {
-        WebElement userInput = waitUtils.waitUntilVisible(USERNAME_INPUT);
-        userInput.clear();
-        userInput.sendKeys(username);
+        pasosEstandar.ingresarTexto(USERNAME_INPUT, username);
+        pasosEstandar.ingresarTexto(PASSWORD_INPUT, password);
+        pasosEstandar.enviarFormulario(LOGIN_FORM, LOGIN_BUTTON, LOGIN_BUTTON_ALT);
+    }
 
-        WebElement passInput = waitUtils.waitUntilVisible(PASSWORD_INPUT);
-        passInput.clear();
-        passInput.sendKeys(password);
+    public void register(String email, String password) {
+        pasosEstandar.ingresarTexto(REGISTER_EMAIL_INPUT, email);
+        pasosEstandar.ingresarTexto(REGISTER_PASSWORD_INPUT, password);
+        pasosEstandar.enviarFormulario(REGISTER_FORM, REGISTER_BUTTON, null);
+    }
 
-        waitUtils.waitUntilClickable(LOGIN_BUTTON).click();
+    public void logoutIfPresent() {
+        try {
+            pasosEstandar.click(LOGOUT_LINK);
+        } catch (TimeoutException e) {
+            // Si no hay logout visible, se asume que no hay sesión activa.
+        }
     }
 
     public boolean isSuccessIndicatorVisible() {
-        return isVisible(SUCCESS_INDICATOR);
+        return isVisible(SUCCESS_INDICATOR) || isVisible(LOGOUT_LINK);
     }
 
     public boolean isErrorMessageVisible() {
@@ -48,11 +65,7 @@ public class LoginPage {
     }
 
     public String getErrorMessageText() {
-        try {
-            return waitUtils.waitUntilVisible(ERROR_MESSAGE).getText().trim();
-        } catch (TimeoutException e) {
-            return "";
-        }
+        return pasosEstandar.obtenerTexto(ERROR_MESSAGE);
     }
 
     private boolean isVisible(By locator) {
@@ -62,4 +75,5 @@ public class LoginPage {
             return false;
         }
     }
+
 }
